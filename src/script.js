@@ -1,13 +1,36 @@
 import "./style.css";
 import * as THREE from "three";
 import gsap from "gsap";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 //Scene
 const scene = new THREE.Scene();
 
+//Lights
+const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+const pointLight = new THREE.PointLight(0xFFFFFF, 0.5);
+pointLight.position.set(2,2,2);
+scene.add(ambientLight, pointLight);
+
+//LoadingManager
+const loadingManager = new THREE.LoadingManager();
+
+//TextureLoader
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const colorTexture = textureLoader.load("/texture/color.jpg");
+const bumpTexture = textureLoader.load("/texture/bump.jpg");
+const displacementTexture = textureLoader.load("/texture/displacementMap.jpg");
+
 //Mesh
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: "purple" });
+const geometry = new THREE.PlaneGeometry(1, 1, 12, 12);
+const material = new THREE.MeshStandardMaterial({ 
+//  wireframe: true,
+//  color: "purple" 
+  map: colorTexture,
+  bumpMap: bumpTexture,
+  displacementMap: displacementTexture
+});
+console.log(material);
 const mesh = new THREE.Mesh(geometry, material);
 
 scene.add(mesh);
@@ -26,6 +49,9 @@ scene.add(camera);
 const canvas = document.querySelector(".draw"); //Select the canvas
 const renderer = new THREE.WebGLRenderer({ canvas }); //add WeBGL Renderer
 renderer.setSize(aspect.width, aspect.height); //Renderer size
+
+// CameraControls
+const orbitControls = new OrbitControls(camera, canvas);
 
 //Clock Class
 const clock = new THREE.Clock();
